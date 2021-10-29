@@ -9,7 +9,9 @@ const(
 	learnerTables = "ученики"
 	courseTables ="курсы"
 	learnerCoursesTables = "ученикЗаписанНаКурс"
+	teacherCoursesTables = "преподавательПреподаетКурс"
 	lessonTables = "занятия"
+	teachersTables = "преподаватели"
 )
 type Config struct{
 	Host string

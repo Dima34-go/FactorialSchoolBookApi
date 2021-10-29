@@ -10,6 +10,7 @@ import (
 const(
 	authorizationHeader = "Authorization"
 	userCtx = "userId"
+	roleCtx = "role"
 )
 func (h *Handler) userIdentity(c *gin.Context){
 	header := c.GetHeader(authorizationHeader)
@@ -42,4 +43,28 @@ func getUserId(c *gin.Context)(int,error){
 		return 0,errors.New("user id is invalid type")
 	}
 	return idInt,nil
+}
+func getUserRole(c *gin.Context)(string,error){
+	role,ok := c.Get(roleCtx)
+	if !ok{
+		newErrorResponse(c,http.StatusInternalServerError,"user role not found")
+		return "",errors.New("user id is not found")
+	}
+	roleString,ok := role.(string)
+	if!ok{
+		newErrorResponse(c,http.StatusInternalServerError,"user role is invalid type")
+		return "",errors.New("user id is invalid type")
+	}
+	return roleString,nil
+}
+func isTeacher(c *gin.Context) error{
+	userRole,err := getUserRole(c)
+	if err!=nil{
+		return err
+	}
+	if userRole!=teacherRole{
+		newErrorResponse(c,http.StatusInternalServerError,"user role is not teacher")
+		return errors.New("user role is not teacher")
+	}
+	return nil
 }

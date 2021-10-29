@@ -6,17 +6,13 @@ import (
 	"strconv"
 )
 
-func (h *Handler) createLesson(c *gin.Context){
 
-}
-func (h *Handler) deleteLesson(c *gin.Context){
-
-}
-func (h *Handler) updateLesson(c *gin.Context){
-
-}
-func (h *Handler) getAllLessons(c *gin.Context){
+func (h *Handler) getAllLessonsForTeacher(c *gin.Context){
 	userId,err := getUserId(c)
+	if err!=nil{
+		return
+	}
+	err=isTeacher(c)
 	if err!=nil{
 		return
 	}
@@ -25,15 +21,19 @@ func (h *Handler) getAllLessons(c *gin.Context){
 		newErrorResponse(c,http.StatusBadRequest,"invalid id param")
 		return
 	}
-	lessons,err :=h.services.TodoLesson.GetAll(userId,courseId)
+	lessons,err :=h.services.TodoLesson.GetAllForTeacher(userId,courseId)
 	if err!=nil{
 		newErrorResponse(c,http.StatusInternalServerError,err.Error())
 		return
 	}
 	c.JSON(http.StatusOK,lessons)
 }
-func (h *Handler) getLessonById(c *gin.Context){
+func (h *Handler) getLessonByIdForTeacher(c *gin.Context){
 	userId,err := getUserId(c)
+	if err!=nil{
+		return
+	}
+	err=isTeacher(c)
 	if err!=nil{
 		return
 	}
@@ -47,7 +47,7 @@ func (h *Handler) getLessonById(c *gin.Context){
 		newErrorResponse(c,http.StatusBadRequest,"invalid id param")
 		return
 	}
-	lesson,err :=h.services.TodoLesson.GetById(userId,courseId,lessonId)
+	lesson,err :=h.services.TodoLesson.GetByIdForTeacher(userId,courseId,lessonId)
 	if err!=nil{
 		newErrorResponse(c,http.StatusInternalServerError,err.Error())
 		return
