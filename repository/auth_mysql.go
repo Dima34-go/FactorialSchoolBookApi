@@ -14,17 +14,20 @@ func NewAuthMysql(db *sqlx.DB) *AuthMysql{
 }
 func (r *AuthMysql) CreateUser(user todo.User) (int,error){
 	var id int
+	tx,err :=r.db.Begin()
 	query:= fmt.Sprintf("INSERT INTO %s (имя, логин, пароль, отчество, фамилия) values (?, ?, ?, ?, ?)", learnerTables)
-	_,err:=r.db.Query(query, user.Name, user.Username, user.Password, user.Patronymic, user.Surname)
+	_,err =tx.Query(query, user.Name, user.Username, user.Password, user.Patronymic, user.Surname)
 	if err!=nil{
+		tx.Rollback()
 		return 0,err
 	}
 	query = fmt.Sprintf("SELECT idученика FROM %s ORDER BY idученика DESC LIMIT 1;",learnerTables)
-	row:=r.db.QueryRow(query)
+	row:=tx.QueryRow(query)
 	if err=row.Scan(&id);err!=nil{
+		tx.Rollback()
 		return 0,err
 	}
-	return id,nil
+	return id,tx.Commit()
 }
 func (r *AuthMysql) GetUser(username, password string) (todo.User,error){
 	var user todo.User

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	todo "FactorialSchoolBook"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -53,4 +54,32 @@ func (h *Handler) getLessonByIdForTeacher(c *gin.Context){
 		return
 	}
 	c.JSON(http.StatusOK,lesson)
+}
+func (h *Handler) createLessonForTeacher(c *gin.Context){
+	userId,err := getUserId(c)
+	if err!=nil{
+		return
+	}
+	err=isTeacher(c)
+	if err!=nil{
+		return
+	}
+	var input todo.Lesson
+	if err:= c.BindJSON(&input);err!=nil{
+		newErrorResponse(c,http.StatusBadRequest,err.Error())
+		return
+	}
+	courseId,err:=strconv.Atoi(c.Param("id"))
+	if err!=nil{
+		newErrorResponse(c,http.StatusBadRequest,"invalid id param")
+		return
+	}
+	id,err:= h.services.CreateLessonForTeacher(input,courseId,userId)
+	if err!=nil{
+		newErrorResponse(c,http.StatusInternalServerError,err.Error())
+		return
+	}
+	c.JSON(http.StatusOK,map[string]interface{}{
+		"id": id,
+	})
 }

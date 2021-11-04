@@ -20,6 +20,10 @@ func (h *Handler) getAllLessons(c *gin.Context){
 	if err!=nil{
 		return
 	}
+	err=isLearner(c)
+	if err!=nil{
+		return
+	}
 	courseId,err:=strconv.Atoi(c.Param("id"))
 	if err!=nil{
 		newErrorResponse(c,http.StatusBadRequest,"invalid id param")
@@ -34,6 +38,10 @@ func (h *Handler) getAllLessons(c *gin.Context){
 }
 func (h *Handler) getLessonById(c *gin.Context){
 	userId,err := getUserId(c)
+	if err!=nil{
+		return
+	}
+	err=isLearner(c)
 	if err!=nil{
 		return
 	}

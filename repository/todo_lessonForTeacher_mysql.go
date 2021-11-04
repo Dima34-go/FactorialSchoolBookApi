@@ -25,3 +25,20 @@ func (r *LessonMysql) GetByIdForTeacher(userId, courseId ,lessonId int) (todo.Le
 	}
 	return lesson,nil
 }
+func (r *LessonMysql) CreateLessonForTeacher(lesson todo.Lesson,courseId  int) (int,error){
+	var id int
+	tx,err:=r.db.Begin()
+	query:= fmt.Sprintf("INSERT INTO %s (idКурса ,название , описание , статусЗанятия) values ( ?, ?, ?, ?)", lessonTables)
+	_,err =tx.Query(query,courseId,lesson.Title,lesson.Description, "Закрыто")
+	if err!=nil{
+		tx.Rollback()
+		return 0,err
+	}
+	query = fmt.Sprintf("SELECT idзанятия FROM %s ORDER BY idзанятия DESC LIMIT 1;",lessonTables)
+	row:=tx.QueryRow(query)
+	if err=row.Scan(&id);err!=nil{
+		tx.Rollback()
+		return 0,err
+	}
+	return id,tx.Commit()
+}

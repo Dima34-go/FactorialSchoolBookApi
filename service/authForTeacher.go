@@ -6,7 +6,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
-type tokenClaimsForTeacher struct{
+type tokenClaimsWithRole struct{
 	jwt.StandardClaims
 	UserId int `json:"user_id"`
 	Role string `json:"role"`
@@ -21,18 +21,18 @@ func (s *AuthService) GenerateTokenForTeacher(username, password string) (string
 	if err!=nil{
 		return "",err
 	}
-	token:= jwt.NewWithClaims(jwt.SigningMethodHS256,&tokenClaimsForTeacher{
+	token:= jwt.NewWithClaims(jwt.SigningMethodHS256,&tokenClaimsWithRole{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
 			IssuedAt: time.Now().Unix(),
 		},
 		UserId: user.Id,
-		Role: "Teacher",
+		Role: teacherRole,
 	})
 	return token.SignedString([]byte(signingKey))
 }
 func (s *AuthService) ParseTokenForTeacher(accessToken string) (todo.UserAuth,error){
-	token,err := jwt.ParseWithClaims(accessToken,&tokenClaimsForTeacher{},func(token *jwt.Token)(interface{},error){
+	token,err := jwt.ParseWithClaims(accessToken,&tokenClaimsWithRole{},func(token *jwt.Token)(interface{},error){
 		if _,ok := token.Method.(*jwt.SigningMethodHMAC); !ok{
 			return nil,errors.New("invalid signing method")
 		}
@@ -41,7 +41,7 @@ func (s *AuthService) ParseTokenForTeacher(accessToken string) (todo.UserAuth,er
 	if err!=nil{
 		return todo.UserAuth{},err
 	}
-	claims,ok:= token.Claims.(*tokenClaimsForTeacher)
+	claims,ok:= token.Claims.(*tokenClaimsWithRole)
 	if !ok{
 		return todo.UserAuth{},errors.New("token claims are not of type *tokenClaims")
 	}

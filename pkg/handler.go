@@ -7,6 +7,7 @@ import (
 const(
 	teacherRelative= "/teacher"
 	teacherRole="Teacher"
+	learnerRole="Learner"
 )
 type Handler struct{
 	services *service.Service
@@ -34,6 +35,8 @@ func (h *Handler) InitRoutes() *gin.Engine{
 			{
 				lessons.GET("/",h.getAllLessons)
 				lessons.GET("/:lesson_id",h.getLessonById)
+				//позже будет убрано
+				lessons.GET("/:lesson_id/get",h.getHomework)
 			}
 		}
 	}
@@ -53,9 +56,13 @@ func (h *Handler) InitRoutes() *gin.Engine{
 			lessons:=courses.Group(":id/lessons")
 			{
 				lessons.GET("/",h.getAllLessonsForTeacher)
+				lessons.POST("/", h.createLessonForTeacher)
 				lessons.GET("/:lesson_id",h.getLessonByIdForTeacher)
+				//позже будет убрано
+				lessons.POST("/:lesson_id",h.addHomeworkForTeacher)
 			}
 		}
 	}
+
 	return router
 }

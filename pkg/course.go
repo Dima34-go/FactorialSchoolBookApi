@@ -24,6 +24,10 @@ func (h *Handler) getAllCourses(c *gin.Context){
 	if err!=nil{
 		return
 	}
+	err=isLearner(c)
+	if err!=nil{
+		return
+	}
 	courses,err := h.services.TodoCourse.GetAll(id)
 	if err!=nil{
 		newErrorResponse(c,http.StatusInternalServerError,err.Error())
@@ -35,6 +39,10 @@ func (h *Handler) getAllCourses(c *gin.Context){
 }
 func (h *Handler) getCourseById(c *gin.Context){
 	userId,err := getUserId(c)
+	if err!=nil{
+		return
+	}
+	err=isLearner(c)
 	if err!=nil{
 		return
 	}

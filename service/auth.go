@@ -13,6 +13,8 @@ const (
 	salt ="fsdhfjhnbcv1231sdf"
 	tokenTTL = 12*time.Hour
 	signingKey = "rweq34453rbdf*$#%"
+	teacherRole = "Teacher"
+	learnerRole = "Learner"
 )
 type tokenClaims struct{
 	jwt.StandardClaims
@@ -35,30 +37,31 @@ func (s *AuthService) GenerateToken(username, password string) (string,error){
 	if err!=nil{
 		return "",err
 	}
-	token:= jwt.NewWithClaims(jwt.SigningMethodHS256,&tokenClaims{
+	token:= jwt.NewWithClaims(jwt.SigningMethodHS256,&tokenClaimsWithRole{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
 			IssuedAt: time.Now().Unix(),
 		},
 		UserId: user.Id,
+		Role: learnerRole,
 	})
 	return token.SignedString([]byte(signingKey))
 }
-func (s *AuthService) ParseToken(accessToken string) (int,error){
-	token,err := jwt.ParseWithClaims(accessToken,&tokenClaims{},func(token *jwt.Token)(interface{},error){
-		 if _,ok := token.Method.(*jwt.SigningMethodHMAC); !ok{
-		 	return nil,errors.New("invalid signing method")
-		 }
-		 return []byte(signingKey),nil
+func (s *AuthService) ParseToken(accessToken string) (todo.UserAuth,error){
+	token,err := jwt.ParseWithClaims(accessToken,&tokenClaimsWithRole{},func(token *jwt.Token)(interface{},error){
+		if _,ok := token.Method.(*jwt.SigningMethodHMAC); !ok{
+			return nil,errors.New("invalid signing method")
+		}
+		return []byte(signingKey),nil
 	})
 	if err!=nil{
-		return 0,err
+		return todo.UserAuth{},err
 	}
-	claims,ok:= token.Claims.(*tokenClaims)
+	claims,ok:= token.Claims.(*tokenClaimsWithRole)
 	if !ok{
-		return 0,errors.New("token claims are not of type *tokenClaims")
+		return todo.UserAuth{},errors.New("token claims are not of type *tokenClaims")
 	}
-	return claims.UserId,nil
+	return todo.UserAuth{UserId: claims.UserId,Role: claims.Role},nil
 }
 func  generatePasswordHash(password string) string{
 	hash := sha1.New()

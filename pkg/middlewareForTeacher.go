@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -25,4 +26,15 @@ func (h *Handler) userIdentityForTeacher(c *gin.Context){
 	}
 	c.Set(userCtx, user.UserId)
 	c.Set(roleCtx, user.Role)
+}
+func isTeacher(c *gin.Context) error{
+	userRole,err := getUserRole(c)
+	if err!=nil{
+		return err
+	}
+	if userRole!=teacherRole{
+		newErrorResponse(c,http.StatusInternalServerError,"user role is not teacher")
+		return errors.New("user role is not "+teacherRole)
+	}
+	return nil
 }

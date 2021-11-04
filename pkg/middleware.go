@@ -24,12 +24,13 @@ func (h *Handler) userIdentity(c *gin.Context){
 		return
 	}
 	//parse token
-	userId, err:= h.services.Authorization.ParseToken(headerParts[1])
+	user, err:= h.services.Authorization.ParseToken(headerParts[1])
 	if err!=nil{
 		newErrorResponse(c,http.StatusUnauthorized,"invalid auth header")
 		return
 	}
-	c.Set(userCtx, userId)
+	c.Set(userCtx, user.UserId)
+	c.Set(roleCtx, user.Role)
 }
 func getUserId(c *gin.Context)(int,error){
 	id,ok := c.Get(userCtx)
@@ -57,14 +58,14 @@ func getUserRole(c *gin.Context)(string,error){
 	}
 	return roleString,nil
 }
-func isTeacher(c *gin.Context) error{
+func isLearner(c *gin.Context) error{
 	userRole,err := getUserRole(c)
 	if err!=nil{
 		return err
 	}
-	if userRole!=teacherRole{
+	if userRole!=learnerRole{
 		newErrorResponse(c,http.StatusInternalServerError,"user role is not teacher")
-		return errors.New("user role is not teacher")
+		return errors.New("user role is not "+learnerRole)
 	}
 	return nil
 }
