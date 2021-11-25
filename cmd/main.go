@@ -2,9 +2,9 @@ package main
 
 import (
 	todo "FactorialSchoolBook"
-	handler "FactorialSchoolBook/pkg"
-	"FactorialSchoolBook/repository"
-	"FactorialSchoolBook/service"
+	handler2 "FactorialSchoolBook/pkg/handler"
+	"FactorialSchoolBook/pkg/repository"
+	"FactorialSchoolBook/pkg/service"
 	"log"
 )
 
@@ -12,7 +12,7 @@ func main(){
 	/*if err:=InitConfig();err!=nil{
 		log.Fatalf("error initializing configs: %s",err.Error())
 	}*/
-	db,err:=repository.NewMysqlDB(repository.Config{
+	db,err:= repository.NewMysqlDB(repository.Config{
 		Host: "localhost",
 		Port: "3306",
 		Username: "root",
@@ -24,7 +24,7 @@ func main(){
 	}
 	repos:= repository.NewRepository(db)
 	services:= service.NewService(repos)
-	handlers:= handler.NewHandler(services)
+	handlers:= handler2.NewHandler(services)
 	srv:=new(todo.Server)
 	if err:=srv.Run("8080",handlers.InitRoutes());err!=nil{/*viper.GetString("port")*/
 		log.Fatalf("error running http server: %v",err)
