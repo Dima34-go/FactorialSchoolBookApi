@@ -5,43 +5,43 @@ import (
 	"net/http"
 	"strconv"
 )
-func (h *Handler) getAllCoursesForTeacher(c *gin.Context){
-	id,err := getUserId(c)
-	if err!=nil{
+
+func (h *Handler) getAllCoursesForTeacher(c *gin.Context) {
+	id, err := getUserId(c)
+	if err != nil {
 		return
 	}
-	err= isTeacher(c)
-	if err!=nil{
+	err = isTeacher(c)
+	if err != nil {
 		return
 	}
-	courses,err := h.services.TodoCourse.GetAllForTeacher(id)
-	if err!=nil{
-		newErrorResponse(c,http.StatusInternalServerError,err.Error())
+	courses, err := h.services.TodoCourse.GetAllForTeacher(id)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, getAllCourseResponse{
 		Data: courses,
 	})
 }
-func (h *Handler) getCourseByIdForTeacher(c *gin.Context){
-	userId,err := getUserId(c)
-	if err!=nil{
+func (h *Handler) getCourseByIdForTeacher(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
 		return
 	}
-	err= isTeacher(c)
-	if err!=nil{
+	err = isTeacher(c)
+	if err != nil {
 		return
 	}
-	id,err:=strconv.Atoi(c.Param("id"))
-	if err!=nil{
-		newErrorResponse(c,http.StatusBadRequest,"invalid id param")
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
 		return
 	}
-	course,err := h.services.TodoCourse.GetByIdForTeacher(userId,id)
-	if err!=nil{
-		newErrorResponse(c,http.StatusInternalServerError,err.Error())
+	course, err := h.services.TodoCourse.GetByIdForTeacher(userId, id)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK,course)
+	c.JSON(http.StatusOK, course)
 }
-

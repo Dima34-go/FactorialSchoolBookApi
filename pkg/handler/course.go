@@ -7,55 +7,56 @@ import (
 	"strconv"
 )
 
-func (h *Handler) createCourse(c *gin.Context){
+func (h *Handler) createCourse(c *gin.Context) {
 
 }
-func (h *Handler) deleteCourse(c *gin.Context){
+func (h *Handler) deleteCourse(c *gin.Context) {
 
 }
-func (h *Handler) updateCourse(c *gin.Context){
+func (h *Handler) updateCourse(c *gin.Context) {
 
 }
-type getAllCourseResponse struct{
+
+type getAllCourseResponse struct {
 	Data []todo.Course `json:"data"`
 }
-func (h *Handler) getAllCourses(c *gin.Context){
-	id,err := getUserId(c)
-	if err!=nil{
+
+func (h *Handler) getAllCourses(c *gin.Context) {
+	id, err := getUserId(c)
+	if err != nil {
 		return
 	}
-	err= isLearner(c)
-	if err!=nil{
+	err = isLearner(c)
+	if err != nil {
 		return
 	}
-	courses,err := h.services.TodoCourse.GetAll(id)
-	if err!=nil{
-		newErrorResponse(c,http.StatusInternalServerError,err.Error())
+	courses, err := h.services.TodoCourse.GetAll(id)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, getAllCourseResponse{
 		Data: courses,
 	})
 }
-func (h *Handler) getCourseById(c *gin.Context){
-	userId,err := getUserId(c)
-	if err!=nil{
+func (h *Handler) getCourseById(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
 		return
 	}
-	err= isLearner(c)
-	if err!=nil{
+	err = isLearner(c)
+	if err != nil {
 		return
 	}
-	id,err:=strconv.Atoi(c.Param("id"))
-	if err!=nil{
-		newErrorResponse(c,http.StatusBadRequest,"invalid id param")
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
 		return
 	}
-	course,err := h.services.TodoCourse.GetById(userId,id)
-	if err!=nil{
-		newErrorResponse(c,http.StatusInternalServerError,err.Error())
+	course, err := h.services.TodoCourse.GetById(userId, id)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK,course)
+	c.JSON(http.StatusOK, course)
 }
-
